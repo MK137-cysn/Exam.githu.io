@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="km">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Premium Registration UX</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Kantumruy+Pro:wght@300;400;700&family=Moul&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #ff3c3c;
+            --dark: #121212;
+            --glass: rgba(255, 255, 255, 0.85);
+        }
+
+        body { 
+            background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
+            background-size: 400% 400%;
+            animation: gradient 15s ease infinite;
+            font-family: 'Kantumruy Pro', sans-serif; 
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        @keyframes gradient {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .main-card { 
+            border-radius: 30px; 
+            border: 1px solid rgba(255, 255, 255, 0.3); 
+            box-shadow: 0 25px 50px rgba(0,0,0,0.15); 
+            max-width: 450px; 
+            width: 100%;
+            background: var(--glass);
+            backdrop-filter: blur(20px);
+            padding: 40px 30px;
+            transition: 0.5s;
+        }
+
+        .header-section { text-align: center; margin-bottom: 30px; }
+        .header-section h2 { 
+            font-family: 'Moul', serif; 
+            color: #800000; 
+            font-size: 24px; 
+            margin-bottom: 5px;
+        }
+
+        .form-label { font-weight: 700; color: #444; font-size: 0.85rem; margin-left: 5px; }
+
+        .form-control, .form-select {
+            border-radius: 15px;
+            padding: 14px 20px;
+            border: 2px solid transparent;
+            background: rgba(255, 255, 255, 0.9);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            transition: 0.3s;
+        }
+
+        .form-control:focus {
+            border-color: #800000;
+            background: #fff;
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(128,0,0,0.1);
+        }
+
+        .btn-register { 
+            background: #800000; 
+            color: white; 
+            border-radius: 18px; 
+            padding: 16px; 
+            font-weight: 700; 
+            width: 100%; 
+            border: none; 
+            margin-top: 10px;
+            box-shadow: 0 10px 25px rgba(128, 0, 0, 0.3);
+            transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .btn-register:hover { transform: scale(1.03); background: #a00000; }
+
+        .chat-admin { 
+            position: fixed; bottom: 30px; left: 30px; width: 60px; height: 60px; 
+            background: #0088cc; border-radius: 20px; display: flex; 
+            align-items: center; justify-content: center; 
+            box-shadow: 0 15px 30px rgba(0,136,204,0.3); z-index: 1000; 
+            color: white; font-size: 26px; text-decoration: none;
+        }
+
+        .admin-trigger { 
+            position: fixed; top: 20px; right: 20px; color: white;
+            font-size: 20px; cursor: pointer; opacity: 0.5; z-index: 1000;
+        }
+
+        .group-area {
+            background: white; border-radius: 20px; padding: 20px;
+            border: 1px solid #0088cc; display: none; margin-top: 20px;
+            animation: fadeInUp 0.5s ease;
+        }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Modal Custom */
+        .custom-modal {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.8); backdrop-filter: blur(10px); z-index: 2000;
+        }
+        .modal-content {
+            background: white; width: 90%; max-width: 400px; margin: 10% auto;
+            border-radius: 25px; padding: 30px; position: relative;
+        }
+    </style>
+</head>
+<body>
+
+<a href="https://t.me/Im_RA12" target="_blank" class="chat-admin"><i class="fa-brands fa-telegram"></i></a>
+<div class="admin-trigger" onclick="openAdmin()"><i class="fa-solid fa-circle-user"></i></div>
+
+<div class="main-card">
+    <div class="header-section">
+        <h2 id="display_site_title">ទម្រង់ចុះឈ្មោះ</h2>
+        <p class="text-muted small">បំពេញព័ត៌មានឱ្យបានគ្រប់ជ្រុងជ្រោយ</p>
+    </div>
+
+    <form id="regForm">
+        <div id="dynamic_inputs_area"></div>
+        
+        <div class="mb-4">
+            <label class="form-label">ថ្នាក់ទី</label>
+            <select id="grade_select" class="form-select" onchange="showGroupButton()" required>
+                <option value="">ជ្រើសរើសថ្នាក់</option>
+                <option value="9">ថ្នាក់ទី ៩</option>
+                <option value="10">ថ្នាក់ទី ១០</option>
+                <option value="11">ថ្នាក់ទី ១១</option>
+                <option value="12">ថ្នាក់ទី ១២</option>
+            </select>
+        </div>
+
+        <div id="group_area" class="group-area text-center">
+            <p class="small fw-bold mb-2">តំណភ្ជាប់ក្រុមតេឡេក្រាម</p>
+            <a href="#" id="group_link" target="_blank" class="btn btn-primary rounded-pill w-100 fw-bold py-2">
+                <i class="fa-brands fa-telegram me-2"></i> ចូលរួមថ្នាក់ទី <span id="grade_num"></span>
+            </a>
+        </div>
+
+        <button type="submit" class="btn-register" id="display_btn_text">ចុះឈ្មោះឥឡូវនេះ</button>
+    </form>
+</div>
+
+<div class="custom-modal" id="admin_modal">
+    <div class="modal-content">
+        <h5 class="fw-bold mb-4 text-center">ការកំណត់ប្រព័ន្ធ</h5>
+        <div id="admin_login">
+            <input type="password" id="admin_pwd" class="form-control mb-3" placeholder="លេខសម្ងាត់">
+            <button class="btn btn-dark w-100 rounded-pill" onclick="checkAdmin()">ចូល</button>
+            <button class="btn btn-link w-100 mt-2 text-muted" onclick="closeAdmin()">បិទ</button>
+        </div>
+        <div id="admin_controls" style="display: none; max-height: 400px; overflow-y: auto;">
+            <label class="small fw-bold">អត្ថបទវេបសាយ</label>
+            <input type="text" id="input_site_title" class="form-control mb-2" placeholder="ចំណងជើង">
+            <input type="text" id="input_btn_text" class="form-control mb-3" placeholder="អក្សរប៊ូតុង">
+            
+            <hr>
+            <label class="small fw-bold">បន្ថែមប្រអប់ (Input)</label>
+            <div class="input-group mb-3">
+                <input type="text" id="new_field_name" class="form-control" placeholder="ឧ. លេខទូរសព្ទ">
+                <button class="btn btn-primary" onclick="addNewField()">+</button>
+            </div>
+            <div id="admin_fields_list" class="mb-3"></div>
+
+            <hr>
+            <label class="small fw-bold">Links ក្រុម Telegram</label>
+            <input type="text" id="link_9" class="form-control mb-1" placeholder="Link ថ្នាក់ទី 9">
+            <input type="text" id="link_10" class="form-control mb-1" placeholder="Link ថ្នាក់ទី 10">
+            <input type="text" id="link_11" class="form-control mb-1" placeholder="Link ថ្នាក់ទី 11">
+            <input type="text" id="link_12" class="form-control mb-3" placeholder="Link ថ្នាក់ទី 12">
+
+            <button class="btn btn-warning w-100 rounded-pill fw-bold" onclick="saveAllConfig()">រក្សាទុក</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    const adminPass = "0319995568";
+    let config = JSON.parse(localStorage.getItem('ultraConfig')) || {
+        siteTitle: "ទម្រង់ចុះឈ្មោះប្រឡង",
+        btnText: "ចុះឈ្មោះឥឡូវនេះ",
+        fields: [{label: "ឈ្មោះពេញ"}, {label: "លេខទូរសព្ទ"}],
+        links: {"9": "#", "10": "#", "11": "#", "12": "#"}
+    };
+
+    function openAdmin() { document.getElementById('admin_modal').style.display='block'; }
+    function closeAdmin() { document.getElementById('admin_modal').style.display='none'; }
+
+    function checkAdmin() {
+        if(document.getElementById('admin_pwd').value === adminPass) {
+            document.getElementById('admin_login').style.display = 'none';
+            document.getElementById('admin_controls').style.display = 'block';
+            document.getElementById('input_site_title').value = config.siteTitle;
+            document.getElementById('input_btn_text').value = config.btnText;
+            document.getElementById('link_9').value = config.links["9"];
+            document.getElementById('link_10').value = config.links["10"];
+            document.getElementById('link_11').value = config.links["11"];
+            document.getElementById('link_12').value = config.links["12"];
+            renderAdminFieldsList();
+        } else { alert('លេខសម្ងាត់មិនត្រឹមត្រូវ!'); }
+    }
+
+    function renderFormFields() {
+        const area = document.getElementById('dynamic_inputs_area');
+        area.innerHTML = '';
+        config.fields.forEach(f => {
+            area.innerHTML += `<div class="mb-3 text-start"><label class="form-label">${f.label}</label><input type="text" class="form-control user-input" data-label="${f.label}" placeholder="បំពេញ${f.label}..." required></div>`;
+        });
+        document.getElementById('display_site_title').innerText = config.siteTitle;
+        document.getElementById('display_btn_text').innerText = config.btnText;
+    }
+
+    function renderAdminFieldsList() {
+        const list = document.getElementById('admin_fields_list');
+        list.innerHTML = '';
+        config.fields.forEach((f, i) => {
+            list.innerHTML += `<div class="d-flex justify-content-between border p-2 mb-1 rounded"><span>${f.label}</span><i class="fa-solid fa-trash text-danger cursor-pointer" onclick="removeField(${i})"></i></div>`;
+        });
+    }
+
+    function addNewField() {
+        const n = document.getElementById('new_field_name').value;
+        if(n) { config.fields.push({label: n}); document.getElementById('new_field_name').value=''; renderAdminFieldsList(); }
+    }
+
+    function removeField(i) { config.fields.splice(i, 1); renderAdminFieldsList(); }
+
+    function saveAllConfig() {
+        config.siteTitle = document.getElementById('input_site_title').value;
+        config.btnText = document.getElementById('input_btn_text').value;
+        config.links["9"] = document.getElementById('link_9').value;
+        config.links["10"] = document.getElementById('link_10').value;
+        config.links["11"] = document.getElementById('link_11').value;
+        config.links["12"] = document.getElementById('link_12').value;
+        localStorage.setItem('ultraConfig', JSON.stringify(config));
+        location.reload();
+    }
+
+    function showGroupButton() {
+        const g = document.getElementById('grade_select').value;
+        const area = document.getElementById('group_area');
+        if(g) { area.style.display='block'; document.getElementById('group_link').href=config.links[g]; document.getElementById('grade_num').innerText=g; }
+        else { area.style.display='none'; }
+    }
+
+    document.getElementById('regForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        const b = document.getElementById('display_btn_text');
+        b.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> កំពុងផ្ញើ...';
+        
+        let m = `🚀 *ចុះឈ្មោះថ្មី*\n`;
+        document.querySelectorAll('.user-input').forEach(i => { m += `🔹 ${i.getAttribute('data-label')}: ${i.value}\n`; });
+        m += `🎓 ថ្នាក់: ${document.getElementById('grade_select').value}`;
+
+        fetch(`https://api.telegram.org/bot8309556629:AAFKx225sEwO-e1m8J-5Av2z9QwDLqLbL0c/sendMessage`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ chat_id: "5010333081", text: m, parse_mode: 'Markdown' })
+        }).then(() => { alert('ជោគជ័យ!'); location.reload(); });
+    });
+
+    window.onload = renderFormFields;
+</script>
+</body>
+  </html>
+
