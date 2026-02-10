@@ -12,7 +12,6 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <style>
-        /* រចនាបទ Ultra Premium ដូចមុន */
         :root { --primary: #800000; --glass: rgba(255, 255, 255, 0.9); }
         body { 
             background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
@@ -28,8 +27,6 @@
         .chat-admin { position: fixed; bottom: 30px; left: 30px; width: 60px; height: 60px; background: #0088cc; border-radius: 20px; display: flex; align-items: center; justify-content: center; color: white; font-size: 26px; text-decoration: none; box-shadow: 0 10px 20px rgba(0,136,204,0.3); z-index: 1000; }
         .admin-trigger { position: fixed; top: 20px; right: 20px; color: white; font-size: 22px; cursor: pointer; opacity: 0.5; z-index: 1000; }
         .group-area { background: #eef9ff; border-radius: 20px; padding: 20px; border: 1px dashed #0088cc; display: none; margin-top: 20px; text-align: center; }
-        
-        /* Modal Admin */
         .custom-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); backdrop-filter: blur(8px); z-index: 2000; }
         .modal-content { background: white; width: 90%; max-width: 420px; margin: 50px auto; border-radius: 25px; padding: 30px; max-height: 85vh; overflow-y: auto; }
     </style>
@@ -103,7 +100,6 @@
 </div>
 
 <script>
-    // 1. Firebase Configuration
     const firebaseConfig = {
         apiKey: "AIzaSyD0CoOErw8unJ2lGF3K4BqTAnq0eFq3ycI",
         authDomain: "myessayapp.firebaseapp.com",
@@ -119,7 +115,6 @@
     const adminPass = "0319995568";
     let config = {};
 
-    // 2. បង្ហាញទិន្នន័យពី Cloud (Sync Real-time)
     db.ref('webConfig').on('value', (snapshot) => {
         config = snapshot.val() || {
             siteTitle: "ទម្រង់ចុះឈ្មោះ",
@@ -140,7 +135,6 @@
         });
     }
 
-    // 3. Admin Functions
     function openAdmin() { document.getElementById('admin_modal').style.display='block'; }
     function closeAdmin() { document.getElementById('admin_modal').style.display='none'; }
 
@@ -178,7 +172,6 @@
 
     function removeField(i) { config.fields.splice(i, 1); renderAdminFieldsList(); }
 
-    // 4. រក្សាទុកទៅកាន់ Cloud (Sync គ្រប់ទូរសព្ទទាំងអស់)
     function saveToCloud() {
         config.siteTitle = document.getElementById('input_site_title').value;
         config.btnText = document.getElementById('input_btn_text').value;
@@ -188,7 +181,7 @@
         config.links["12"] = document.getElementById('link_12').value;
 
         db.ref('webConfig').set(config).then(() => {
-            alert('Cloud Sync ជោគជ័យ! សិស្សគ្រប់គ្នានឹងឃើញការផ្លាស់ប្តូរ។');
+            alert('Cloud Sync ជោគជ័យ!');
             closeAdmin();
         });
     }
@@ -203,22 +196,40 @@
         } else { area.style.display='none'; }
     }
 
-    // 5. បញ្ជូនព័ត៌មានទៅ Telegram
     document.getElementById('regForm').addEventListener('submit', function(e) {
         e.preventDefault();
         const b = document.getElementById('display_btn_text');
         b.innerHTML = '<i class="fa-solid fa-spinner fa-spin me-2"></i>កំពុងបញ្ជូន...';
         b.disabled = true;
 
-        let m = `🚀 *ការចុះឈ្មោះថ្មី (Cloud)*\n`;
-        document.querySelectorAll('.user-input').forEach(i => { m += `🔹 *${i.getAttribute('data-label')}:* ${i.value}\n`; });
-        m += `🎓 *ថ្នាក់ទី:* ${document.getElementById('grade_select').value}`;
+        const grade = document.getElementById('grade_select').value;
+        
+        // កំណត់ Group ID តាមថ្នាក់នីមួយៗ
+        let targetGroupId = "5010333081"; // ID ដើមរបស់លោកគ្រូ
+        if (grade === "9") targetGroupId = "-1003632979931";
+        else if (grade === "10") targetGroupId = "-1003899114554";
+        else if (grade === "11") targetGroupId = "-1003801108031";
+        else if (grade === "12") targetGroupId = "-1003796956626";
 
-        fetch(`https://api.telegram.org/bot8309556629:AAFKx225sEwO-e1m8J-5Av2z9QwDLqLbL0c/sendMessage`, {
+        let m = `🚀 *ការចុះឈ្មោះថ្មី (ថ្នាក់ទី ${grade})*\n`;
+        document.querySelectorAll('.user-input').forEach(i => { m += `🔹 *${i.getAttribute('data-label')}:* ${i.value}\n`; });
+        m += `🎓 *ថ្នាក់ទី:* ${grade}`;
+
+        // បញ្ជូនទៅ Group តាមថ្នាក់
+        const sendToGrade = fetch(`https://api.telegram.org/bot8309556629:AAFKx225sEwO-e1m8J-5Av2z9QwDLqLbL0c/sendMessage`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ chat_id: targetGroupId, text: m, parse_mode: 'Markdown' })
+        });
+
+        // បញ្ជូនទៅ Chat ID ផ្ទាល់ខ្លួនរបស់លោកគ្រូ (Backup)
+        const sendToAdmin = fetch(`https://api.telegram.org/bot8309556629:AAFKx225sEwO-e1m8J-5Av2z9QwDLqLbL0c/sendMessage`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ chat_id: "5010333081", text: m, parse_mode: 'Markdown' })
-        }).then(() => { 
+        });
+
+        Promise.all([sendToGrade, sendToAdmin]).then(() => { 
             alert('ការចុះឈ្មោះទទួលបានជោគជ័យ!'); 
             location.reload(); 
         });
